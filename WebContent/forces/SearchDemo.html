@@ -22,7 +22,15 @@
 </head>
 
 <body>
-    <script src="d3.min.js"></script>
+    <script src="../d3.min.js"></script>
+    <script src="jquery/external/jquery/jquery.js"></script>
+    <script src="jquery/jquery-ui.js"></script>
+    <link rel="stylesheet" href="jquery/jquery-ui.css"></script>
+
+    <div class="ui-widget">
+        <input id="search">
+        <button type="button" onclick="searchNode()">Search</button>
+    </div>
     <script>
         var width = 960,
             height = 500;
@@ -32,24 +40,37 @@
         var force = d3.layout.force()
             .charge(-120)
             .linkDistance(30)
-            .linkStrength(1)
-            .friction(0.9)
-            .gravity(0.1)
             .size([width, height]);
 
         var svg = d3.select("body").append("svg")
             .attr("width", width)
             .attr("height", height);
-
-        d3.json("relations.json", function(error, graph) {
+        var graphRec = null;
+        var link = null;
+        var graph = null;
+        var node = null;
+        var optArray = [];
+        d3.json("relations.json", function(error, gr) {
             if (error) throw error;
+            graph = gr;
             console.log(graph);
+
+            for (var i = 0; i < graph.nodes.length - 1; i++) {
+                optArray.push(graph.nodes[i].name);
+            }
+            optArray = optArray.sort();
+            $(function() {
+                $("#search").autocomplete({
+                    source: optArray
+                });
+            });
+            graphRec = JSON.parse(JSON.stringify(graph));
             force
                 .nodes(graph.nodes)
                 .links(graph.links)
                 .start();
 
-            var link = svg.selectAll(".link")
+            link = svg.selectAll(".link")
                 .data(graph.links)
                 .enter().append("line")
                 .attr("class", "link")
@@ -57,7 +78,7 @@
                     return Math.sqrt(d.value);
                 });
 
-            var node = svg.selectAll(".node")
+            node = svg.selectAll(".node")
                 .data(graph.nodes)
                 .enter().append("circle")
                 .attr("class", "node")
@@ -93,7 +114,30 @@
                         return d.y;
                     });
             });
+
+
         });
+
+
+
+        function searchNode() {
+            //find the node
+            var selectedVal = document.getElementById('search').value;
+            var node = svg.selectAll(".node");
+            if (selectedVal == "none") {
+                node.style("stroke", "white").style("stroke-width", "1");
+            } else {
+                var selected = node.filter(function(d, i) {
+                    return d.name != selectedVal;
+                });
+                selected.style("opacity", "0");
+                var link = svg.selectAll(".link")
+                link.style("opacity", "0");
+                d3.selectAll(".node, .link").transition()
+                    .duration(5000)
+                    .style("opacity", 1);
+            }
+        }
     </script>
 </body>
 
