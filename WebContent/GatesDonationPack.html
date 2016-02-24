@@ -8,106 +8,155 @@
 <body>
     <div id="chart"></div>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.13/d3.min.js"></script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-    <script src="CustomToolTip.js"></script>
     <link rel="stylesheet" href="style.css">
-    <div>
-        <input type="radio" name="group" value="all">ALL</input>
-        <input type="radio" name="group" value="year">YEAR</input>
-        <input type="checkbox" name="top" value="top">TOP5</input>
-    </div>
+    <button type="button" id="addTask">Add Task</button>
+    <button type="button" id="tasks">Tasks</button>
+    <button type="button" id="progress">Progress</button>
+    <button type="button" id="trash">Delete</button>
+
     <div id="vis"></div>
     <script>
         var width = 940;
         var height = 600;
-
-        var tooltip = new CustomTooltip("gates_tooltip", 240);
-
 
         //locations the nodes will move towards depending on which view is currently being used
         var center = {
             x: width / 2,
             y: height / 2
         };
-        //defining the regions.
+        var taskStatuses = ["ready", "in-progress", "complete"];
+        var tooltip = d3.tip()
+            .attr('class', 'tooltip')
+            .offset([-10, 0])
+            .html(function(d) {
+                var content = "<span class=\"name\">Name :</span><span class=\"value\">" + d.name + "</span><br/>"
+                content += "<span class=\"name\">Task Priority:</span><span class=\"value\">P" + d.priority + "</span><br/>"
+                content += "<span class=\"name\">Task Status:</span><span class=\"value\">" + d.taskStatus + "</span><br/>"
+                content += "<span class=\"name\">Type:</span><span class=\"value\">" + d.type + "</span>";
+                return content;
+            })
+        var options = {
+            ">": function(d) {
+                d3.select("#vis>svg>g").remove();
+                var thisRegion = parseInt(d.x / (width / 3));
+                if (thisRegion < 2) {
+                    var a = taskStatuses[thisRegion + 1];
+                    d.taskStatus = a;
+                    d.fixed = false;
+                    display_by_year();
+                }
+            },
 
-        var year_centers = {
-            "2008": {
-                x: width / 3,
-                y: height / 2
+            "+": function(d) {
+                if(d.priority<6){
+                   //only in this, can the priority be increased.
+                    
+                }
             },
-            "2009": {
-                x: width / 2,
-                y: height / 2
+            "T": function(d) {
+
             },
-            "2010": {
-                x: 2 * width / 3,
+            "-": function(d) {
+                alert("decrease priority");
+            },
+
+            "<": function(d) { //we want the data here.
+                d3.select("#vis>svg>g").remove();
+                var thisRegion = parseInt(d.x / (width / 3));
+                var a = taskStatuses[thisRegion - 1];
+                d.taskStatus = a;
+                d.fixed = false;
+                display_by_year();
+            }
+        };
+        var keys = d3.keys(options).length;
+        var pie = d3.layout.pie()
+            .sort(null)
+            .value(function(d) {
+                return keys;
+            });
+        var types = ["development", "testing", "bug-fix", "spike"];
+        var owners = ["Manmeet", "Gopi", "Mandeep", "Komal"];
+        var regionSize = width / 4;
+        var i = 1;
+        var taskRegions = {};
+        for (var d in taskStatuses) {
+            taskRegions[taskStatuses[d]] = {
+                x: regionSize * i,
                 y: height / 2
             }
-        }
-
+            i++;
+        };
 
         //used when setting up force and moving around nodes
         //set too low gravity.
         var layout_gravity = -0.01;
         var damper = 0.1;
         var force = null;
-
-
-
+        var nodes = [];
+        var radius_scale = null;
+        var fill_color = null;
+        var vis = null;
+        var ownersColor = d3.scale.category20();
+        var optionColors = d3.scale.category20b();
         //root = exports ? this
         var data = [];
-        var groups = ["low", "medium", "high"];
-        var yearz = [2008, 2009, 2010];
         $(document).ready(function() {
-            for (i = 1; i <= 255; i++) {
+            for (i = 1; i <= 20; i++) {
                 data.push({
-                    total_amount: parseInt(Math.random() * 1000000),
+
+                    priority: parseInt(Math.random() * 6) + 1,
                     id: i,
-                    grant_title: "Title" + parseInt(Math.random() * 100000),
-                    organization: "Flipkart",
-                    group: groups[parseInt(Math.random() * 3)],
-                    start_year: yearz[parseInt(Math.random() * 3)]
+                    name: "Task" + parseInt(Math.random() * 100000),
+                    sprint: "Sprint",
+                    type: types[parseInt(Math.random() * types.length)],
+                    owner: owners[parseInt(Math.random() * owners.length)],
+                    taskStatus: taskStatuses[parseInt(Math.random() * taskStatuses.length)]
                 });
             }
             render(data);
         });
-        var nodes = [];
-        var radius_scale = null;
-        var fill_color = null;
-        //these will be set in create_nodes and 
+        d3.json("tasks.json", function(error, tasks) {
+            if (error) throw error;
+            // console.log(tasks);
+        });
+
         function render(data) {
-            var vis = null;
             var circles = null;
 
             //nice looking colors - no reason to buck the trend 
             fill_color = d3.scale.ordinal()
-                .domain(["low", "medium", "high"])
-                .range(["#d62728", "#2ca02c", "#ffff00"]);
+                .domain(types)
+                .range(["red", "green", "orange", "yellow"]);
 
             //use the max total_amount in the data as the max in the scale 's domain
-            var max_amount = d3.max(data, function(d) {
-                return parseInt(d.total_amount);
+            var maxPriority = d3.max(data, function(d) {
+                return d.priority;
             });
-            console.log(max_amount);
-            radius_scale = d3.scale.pow().exponent(0.5).domain([0, max_amount]).range([1, 20]);
+            console.log(maxPriority);
+            radius_scale = d3.scale.pow().exponent(2).domain([0, maxPriority]).range([3, 65]);
 
             create_nodes();
             force = d3.layout.force()
                 .nodes(nodes)
                 .size([width, height]);
-            create_vis();
-            display_by_year();
-            $('input[name=group]').on('change', function() {
-                var choice = $('input[name=group]:checked').val();
-                if (choice === 'all') {
-                    display_group_all();
-                } else if (choice === 'year') {
-                    display_by_year();
-                }
+            var svz = d3.select("#vis").append("svg");
+            vis = svz
+                .attr("width", width)
+                .attr("height", height)
+                .attr("id", "svg_vis");
+            svz.call(tooltip);
+            create_vis(vis);
+            display_group_all();
+            $('#tasks').on('click', function() {
+                display_group_all();
             });
-
-            $('input[name=top]').on('click', function() {
+            $('#progress').on('click', function() {
+                display_by_year();
+            });
+            $('#addTask2').on('click', function() {
                 var choice = $('input[name=top]:checked').length == 1 ? true : false;
                 console.log(choice);
                 if (choice) {
@@ -116,27 +165,60 @@
                     highlightTop(5, 1.0);
                 }
             });
+
+            $('#addTask').on("click", function() {
+                var p = parseInt(Math.random() * 6) + 1;
+                var task = {
+                        priority: p,
+                        id: parseInt(Math.random() * 100000),
+                        name: "Task" + parseInt(Math.random() * 100000),
+                        sprint: "Sprint",
+                        type: types[parseInt(Math.random() * types.length)],
+                        taskStatus: taskStatuses[0],
+                        owner: owners[parseInt(Math.random() * owners.length)],
+                        radius: radius_scale(p),
+                        x: 0,
+                        y: 0
+                    }
+                    //now that the task is created.
+                nodes.push(task);
+                create_vis(vis);
+                display_by_year();
+            });
+        }
+
+
+        function displayOptions(x, y, radius, id, svg) {
+            var arc = d3.svg.arc()
+                .outerRadius(radius)
+                .innerRadius(radius + 20);
+            var slice = svg.append("g").attr('id', 'g' + id).attr("transform", "translate(" + x + "," + (y) + ")").selectAll("path")
+                .data(pie(d3.keys(options)));
+            slice.enter()
+                .insert("path")
+                .attr("d", function(d) {
+                    console.log(arc(d));
+                    return arc(d);
+                }).attr("data-circleid", id).attr("fill", function(d) {
+                    console.log(d.data);
+                    return optionColors(d.data);
+                }).on('click', function(d) {
+                    var task = d3.select("#bubble_" + d3.select(this).attr('data-circleid')).data()[0];
+                    options[d.data](task);
+                }).attr("opacity", 0).transition().attr('opacity', 1);
         }
         //create node objects from original data# that will serve as the data behind each# bubble in the vis, then add each node# to@ nodes to be           //used later
         function create_nodes() {
             data.forEach(function(d) {
-                var node = {
-                    id: d.id,
-                    radius: radius_scale(parseInt(d.total_amount)),
-                    value: d.total_amount,
-                    name: d.grant_title,
-                    org: d.organization,
-                    group: d.group,
-                    year: d.start_year,
-                    x: Math.random() * 900,
-                    y: Math.random() * 800
-                };
-                nodes.push(node);
+                d.radius = radius_scale(d.priority);
+                d.x = Math.random() * 900;
+                d.y = Math.random() * 800;
             });
-            nodes.sort(function(a, b) {
-                return b.value - a.value;
+            data.sort(function(a, b) {
+                return b.priority - a.priority;
             });
-            console.log(nodes);
+            console.log(data);
+            nodes = data;
         }
 
 
@@ -160,11 +242,7 @@
 
 
         //# create svg at# vis and then# create circle representation for each node
-        function create_vis() {
-            vis = d3.select("#vis").append("svg")
-                .attr("width", width)
-                .attr("height", height)
-                .attr("id", "svg_vis");
+        function create_vis(vis) {
 
             circles = vis.selectAll("circle")
                 .data(nodes, function(d) {
@@ -175,25 +253,47 @@
             circles.enter().append("circle")
                 .attr("r", 0)
                 .attr("fill", function(d) {
-                    return fill_color(d.group);
+                    return fill_color(d.type);
                 })
-                .attr("stroke-width", 1)
+                .attr("stroke-width", 2)
                 .attr("stroke", function(d) {
-                    return d3.rgb(fill_color(d.group)).darker();
+                    return "black";
                 })
                 .attr("id", function(d) {
                     return "bubble_" + d.id;
+                }).attr("cx", function(d) {
+                    return d.x;
                 })
-                .on("mouseover", function(d, i) {
-                    show_details(d, i, this)
+                .attr("cy", function(d) {
+                    return d.y;
+                })
+                .attr("opacity", 0.75)
+                .on("mouseover", function(d) {
+                    d3.select(this).attr("stroke-width", 4);
+                    tooltip.show(d);
                 })
                 .on("mouseout", function(d, i) {
-                    return hide_details(d, i, this)
-                });
+                    d3.select(this).attr("stroke-width", 2);
+                    tooltip.hide();
+                }).on('dblclick', function(d) {
+                    console.log(d);
+                    d3.select("#vis>svg>g").transition().remove();
+                    if (!d.fixed) {
+                        d.fixed = true;
+                        displayOptions(d.x, d.y, d.radius, d.id, d3.select("#vis>svg"));
+                    } else {
+                        d.fixed = false;
+                        d3.select("#vis>svg>g").remove();
+                    }
+                })
+                .call(node_drag);
 
             circles.transition().duration(2000).attr("r", function(d) {
                 return d.radius;
-            });
+            }).transition().attr("stroke", function(d) {
+                return ownersColor(d.owner);
+            }).attr("stroke-width", 3);
+
 
         }
 
@@ -213,11 +313,53 @@
         }
 
 
+        var node_drag = d3.behavior.drag()
+            .on("dragstart", dragstart)
+            .on("drag", dragmove)
+            .on("dragend", dragend);
+
+        var originalRegion = null;
+
+        function dragstart(d, i) {
+            //force.resume();
+            originalRegion = parseInt(d.x / (width / 3));
+            //force.stop() // stops the force auto positioning before you start dragging
+        }
+
+        function dragmove(d, i) {
+            d.px += d3.event.dx;
+            d.py += d3.event.dy;
+            d.x += d3.event.dx;
+            d.y += d3.event.dy;
+        }
+        //look at mouseover vs mousedown in force.drag
+        function dragend(d, i) {
+            var regionIndex = parseInt(d.x / (width / 3));
+            var a = taskStatuses[regionIndex];
+            if (originalRegion != regionIndex) {
+                d.taskStatus = a;
+                display_by_year();
+
+            } else {
+                force.resume();
+            }
+            //console.log(d);// of course set the node to fixed so the force doesn't include the node in its auto positioning stuff
+        }
+
+        function toggleFixed(d) {
+            if (d.fixed) {
+                d.fixed = false;
+            } else {
+                d.fixed = true;
+            }
+            // of course set the node to fixed so the force doesn't include the node in its auto positioning stuff
+            force.resume();
+        }
 
 
         // # Sets up force layout to display all nodes in one circle.
         function display_group_all() {
-            force.gravity(layout_gravity)
+            force //.gravity(layout_gravity)
                 .charge(charge)
                 .friction(0.9)
                 .on("tick", function(e) {
@@ -268,7 +410,7 @@
         //# move all circles to their associated @year_centers 
         function move_towards_year(alpha) {
             return function(d) {
-                target = year_centers[d.year]
+                target = taskRegions[d.taskStatus]
                 d.x = d.x + (target.x - d.x) * (damper + 0.02) * alpha * 1.1;
                 d.y = d.y + (target.y - d.y) * (damper + 0.02) * alpha * 1.1;
             }
@@ -279,9 +421,9 @@
         // # Method to display year titles
         function display_years() {
             var years_x = {
-                "2008": 160,
-                "2009": width / 2,
-                "2010": width - 160
+                "ready": 160,
+                "in-progress": width / 2,
+                "complete": width - 160
             };
             var years_data = d3.keys(years_x);
             var years = vis.selectAll(".years")
@@ -301,35 +443,6 @@
         //# Method to hide year titiles
         function hide_years() {
             years = vis.selectAll(".years").remove();
-        }
-
-
-        function show_details(data, i, element) {
-            //console.log(data);
-            /*d3.select("#vis>svg").append("g").attr("transform", "translate(" + $(element).attr("cx") + "," + $(element).attr("cy") + ")").selectAll('circle').data([data]).enter().append('circle')
-                .attr("r", function(s) {
-                    return s.radius + 5;
-                })
-                .attr("opacity",0.1)
-                .attr("stroke-width", 2)
-                .attr("stroke", function(d) {
-                    return d3.rgb(fill_color(d.group)).darker();
-                });*/
-            d3.select(element).attr("stroke", "black");
-            d3.select(element).attr("stroke-width", 2)
-            content = "<span class=\"name\">Title:</span><span class=\"value\">" + data.name + "</span><br/>"
-            content += "<span class=\"name\">Amount:</span><span class=\"value\">" + data.value + "</span><br/>"
-            content += "<span class=\"name\">Year:</span><span class=\"value\">" + data.year + "</span>";
-            tooltip.showTooltip(content, d3.event);
-        }
-
-        function hide_details(data, i, element) {
-            //d3.selectAll("#vis>svg>g").remove();
-            d3.select(element).attr("stroke-width", 1);
-            d3.select(element).attr("stroke", function(d) {
-                return d3.rgb(fill_color(d.group)).darker();
-            });
-            tooltip.hideTooltip();
         }
     </script>
 
