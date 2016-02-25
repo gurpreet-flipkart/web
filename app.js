@@ -1,4 +1,5 @@
 var express = require('express');
+var http = require('http');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -9,7 +10,8 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
-
+// all environments
+app.set('port', process.env.PORT || 3000);
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -21,7 +23,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
 app.use('/', routes);
 app.use('/users', users);
 
@@ -57,4 +58,11 @@ app.use(function(err, req, res, next) {
 });
 
 
-module.exports = app;
+//app.get('/', routes.flight);
+//app.put('/flight/:number/arrived', routes.arrived);
+//app.get('/list', routes.list);
+//app.get('/list/json', routes.listjson);
+
+http.createServer(app).listen(app.get('port'), function(){
+  console.log('Express server listening on port ' + app.get('port'));
+});
