@@ -1,0 +1,147 @@
+@CHARSET "UTF-8";
+body {
+    font: normal 14px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+    color: black;
+}
+
+th.parameter{
+    
+}
+
+
+th {
+    text-align: center;
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+    border-top: 1px solid black;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 6px 6px 6px;
+    background-color: white;
+    line-height: 1.5em;
+}
+
+td {
+    text-align: center;
+    border-right: 1px solid grey;
+    border-bottom: 1px solid grey;
+    padding: 6px 6px 6px 6px;
+    border-right: 1px solid grey;
+    line-height: 1.5em;
+}
+
+#rangebuilder {
+    border-style: solid;
+    border-color: grey;
+    border-width: 1px;
+    display: inline-table;
+    
+}
+.field>img{
+    width: 20px;
+    height: 20px;
+}
+#rangebuilder td {
+    width: 2px;
+}
+
+#experiment,
+#header>thead {
+    text-transform: uppercase;
+}
+
+#experiment {
+    z-index: 10;
+    position: fixed;
+    left: 0px;
+    border-right-style: solid;
+    border-top-style: solid;
+    border-right-width: 1px;
+    border-right-color: grey;
+    border-top-color: grey;
+    border-collapse: collapse;
+}
+#controls {
+    z-index: 10;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    background-color: white;
+}
+
+a:link {
+    text-decoration: none;
+    color: black;
+}
+
+a:visited {
+    color: grey;
+}
+
+div {
+    background-color: white;
+}
+
+#error{
+    color:red;
+}
+
+.label {
+    background-color: silver;
+}
+
+
+
+#header {
+    margin-left: 310px;
+    margin-top: 170px;
+    border-collapse: collapse;
+    border-top-style: solid;
+    background-color: white;
+}
+
+.range {
+    border-left-width: 2px;
+    border-left-style: solid;
+    border-left-color: 'orange';
+}
+
+.zone {
+    border-left-width: 2px;
+    border-left-style: solid;
+    border-left-color: 'blue';
+}
+
+.stat {
+    border-left-width: 2px;
+    border-left-style: solid;
+    border-left-color: 'lime';
+}
+
+#header th {
+    width: 100px;
+    overflow: hidden;
+}
+
+.TOTAL {
+    font-weight: bolder;
+}
+
+#overlap {
+    position: fixed;
+    top: 50%;
+    left: 45%;
+    visibility: hidden;
+}
+
+#selections {
+    position: fixed;
+    top: 50px;
+    left: 500px;
+    z-index: -10;
+}
+#headline {
+    text-align: center;
+    font-size: medium;
+}

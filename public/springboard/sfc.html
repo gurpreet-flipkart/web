@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Learning D3</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <link rel="stylesheet" href="mystyle.css">
+    <script src="Table.js"></script>
+</head>
+
+<body>
+    <table>
+
+    </table>
+    <script>
+        function Set() {
+            'use strict';
+            var map = new Object();
+            this.list = [];
+            this.add = function(element) {
+                //console.log(element);
+                if (!map[element]) {
+                    this.list.push(element);
+                    map[element] = true;
+                }
+            }
+        }
+
+        function shuffle(array) {
+            var currentIndex = array.length,
+                temporaryValue, randomIndex;
+
+            // While there remain elements to shuffle...
+            while (0 !== currentIndex) {
+
+                // Pick a remaining element...
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
+
+                // And swap it with the current element.
+                temporaryValue = array[currentIndex];
+                array[currentIndex] = array[randomIndex];
+                array[randomIndex] = temporaryValue;
+            }
+
+            return array;
+        }
+
+        var colorsArr = ['#9edae5', '#c7c7c7', '#c5b0d5', '#ffbb78',
+            '#dbdb8d', '#e7cb94', '#17becf', '#c49c94'
+        ];
+        var zoneColor = d3.scale.ordinal().domain('North', 'East', 'West',
+            'South').range(shuffle(colorsArr));
+        var zones = ['North', 'South', 'East', 'West'];
+        var table = new Table(zoneColor);
+        table.headers(["zone", "Hub name"]);
+        var columns = ['BRSNR', 'RESORT_EXPECTED', 'OUTBOUND_PENDING', "PROCESS_PENDING", "FCPH_EXPECTED"];
+
+        
+        var sortByName = function(a, b) {
+            return d3.ascending(a.name, b.name);
+        }
+        
+        
+        var sortingCriteria=sortByName;
+
+
+        var sortByColumn = function(column) {
+            return function(a, b) {
+                var col = column;
+                var aColVal = d3.select("#h-" + a.id).select('.' + col).html();
+                var bColVal = d3.select("#h-" + b.id).select('.' + col).html();
+                if (aColVal === '') {
+                    aColVal = 0;
+                }
+                if (bColVal === '') {
+                    bColVal = 0;
+                }
+                aColVal = parseInt(aColVal);
+                bColVal = parseInt(bColVal);
+                return d3.descending(aColVal, bColVal);
+            }
+        }
+        setInterval(function() {
+            var data = [];
+            var times = parseInt(Math.random() * 100);
+            for (var i = 0; i <= times; i++) {
+                var id = parseInt(Math.random() * 100);
+                var d = {
+                    id: id,
+                    zone: zones[parseInt(Math.random() * zones.length)],
+                    name: "h" + id,
+                    count: parseInt(Math.random() * 10000)
+                }
+                data.push(d);
+            }
+            table.render(data, columns[parseInt(Math.random() * columns.length)], sortingCriteria);
+        }, 3000);
+    </script>
+
+</body>
+
+</html>
