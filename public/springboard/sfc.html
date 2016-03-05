@@ -92,12 +92,12 @@
                     id: id,
                     zone: zones[parseInt(Math.random() * zones.length)],
                     name: "h" + id,
-                    count: parseInt(Math.random() * 10000)
+                    count: parseInt(Math.random() * 100000000)
                 }
                 data.push(d);
             }
             table.render(data, columns[parseInt(Math.random() * columns.length)], sortingCriteria);
-        }, 3000);
+        }, 10000);
     </script>
 
 </body>
