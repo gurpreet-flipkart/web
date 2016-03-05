@@ -17,7 +17,7 @@ var Table = function(colorScheme) {
             that.heads.add(d);
         });
         this.tableHeader = d3.selectAll("table").append("tr").attr('id', 'header');
-        this.tableHeader.selectAll('th').data(this.heads.list).enter().append("th").classed('parameter', true).html(function(d) {
+        this.tableHeader.selectAll('th').data(this.heads.list).enter().append("th").html(function(d) {
             return d;
         }).style('background-color', function(d) {
             return colorScheme(d);
@@ -25,6 +25,8 @@ var Table = function(colorScheme) {
             //d is the name of the column here.
             sortingCriteria = sortByColumn(d);
             d3.selectAll('.zonehub').sort(sortingCriteria);
+            d3.select('.parameter').classed('parameter', false);
+            d3.select(this).classed('parameter', true);
         });
     }
 
