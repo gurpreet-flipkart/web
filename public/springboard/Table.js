@@ -16,7 +16,7 @@ var Table = function(colorScheme) {
         this.columns.forEach(function(d) {
             that.heads.add(d);
         });
-        this.tableHeader = d3.selectAll("table").append("tr").attr('id', 'header');
+        this.tableHeader = d3.select("thead").append('tr').attr('id', 'header');
         this.tableHeader.selectAll('th').data(this.heads.list).enter().append("th").html(function(d) {
             return d;
         }).style('background-color', function(d) {
@@ -28,6 +28,8 @@ var Table = function(colorScheme) {
             d3.select('.parameter').classed('parameter', false);
             d3.select(this).classed('parameter', true);
         });
+        //{fixedOffset: $('#controls')}
+        $('table').stickyTableHeaders(/*{fixedOffset: $('body')}*/);
     }
 
 
@@ -35,7 +37,7 @@ var Table = function(colorScheme) {
     this.render = function(jsondata, column, sortFunction) {
         console.log('render with column:' + column);
         this.data = jsondata;
-        var rowZ = d3.selectAll("table").selectAll(".zonehub").data(this.data, function(d) {
+        var rowZ = d3.selectAll("tbody").selectAll(".zonehub").data(this.data, function(d) {
             return d.id;
         });
         renderNewRows(rowZ, column);
@@ -46,6 +48,7 @@ var Table = function(colorScheme) {
         //validate the constraint that jsondata.length ==selected .column's length
         d3.selectAll('.zonehub').sort(sortFunction);
         //renderOldColumns(rowZ, column);
+        $('table').stickyTableHeaders(/*{fixedOffset: $('body')}*/);
 
     }
 
