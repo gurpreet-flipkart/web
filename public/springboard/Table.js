@@ -56,8 +56,8 @@ var Table = function(colorScheme) {
         renderExistingRows(rowZ, column);
         renderNewRows(rowZ, column);
         //console.log(maxColMap);
-        var hub = getMax(rowZ,column);
-        highlightMax(rowZ,column, hub);
+        var hub = getMax(column);
+        highlightMax(column, hub);
         //validate the constraint that jsondata.length ==selected .column's length
         d3.selectAll('.zonehub').sort(sortFunction);
         renderOldRows(rowZ, column);
@@ -65,10 +65,10 @@ var Table = function(colorScheme) {
     }
 
 
-    function getMax(rowZ,column) {
+    function getMax(column) {
         var max = -1;
         var id = -1;
-        rowZ.selectAll("." + column).each(function(d) {
+        d3.selectAll("." + column).each(function(d) {
             if (d3.select(this).html() !== '') {
                 var count = parseInt(d3.select(this).html());
                 if (count > max) {
@@ -84,11 +84,11 @@ var Table = function(colorScheme) {
         };
     }
 
-    function highlightMax(rowZ,column, hub) {
+    function highlightMax(column, hub) {
         d3.select("." + column + "-max").classed(column + "-max", false).style('background-color', 'white');
         var match = false;
         var debug = "";
-        rowZ.selectAll("." + column)
+        d3.selectAll("." + column)
             .filter(function(d) {
                 var html = d3.select(this).html();
                 var value = 0;
