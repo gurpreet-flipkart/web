@@ -40,7 +40,7 @@ var Table = function(colorScheme) {
         }).append('span').classed('glyphicon', true).classed('glyphicon-refresh', true).attr('aria-hidden', true).on('click', function(c){
             refresh(c);
         });
-        $('table').stickyTableHeaders( /*{fixedOffset: $('body')}*/ );
+        $('table').stickyTableHeaders( /*{fixedOffset: $('.stick')}*/ );
     }
 
 
@@ -137,11 +137,11 @@ var Table = function(colorScheme) {
         var that = colorScheme;
         var newRowz = rowZ.enter().append('tr').classed('zonehub', true).attr("id", function(d) {
             return 'h-' + d.id;
-        }).on('mouseover', function(d) {
+        });/*.on('mouseover', function(d) {
             d3.select(this).style('opacity', 1.0);
         }).on('mouseout', function(d) {
             d3.select(this).style('opacity', 0.75);
-        }).style('opacity', 0.75);
+        }).style('opacity', 0.75);*/
         //adding new column for zone.
         newRowz.append('td')
             .html(function(d) {
@@ -172,7 +172,7 @@ var Table = function(colorScheme) {
     function show(cur, color, delay) {
         //alert(color);
         this.style({
-            "border-right-width": '3px',
+            "border-right-width": '2px',
             "border-right-color": color
         });
         /*.transition().duration(2500).delay(delay).style({

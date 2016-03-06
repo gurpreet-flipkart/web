@@ -1,8 +1,8 @@
 @CHARSET "UTF-8";
 body {
-    font: normal 14px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+    margin: auto;
     color: black;
-    background: #f8f8f8;
+    padding: 20px;
 }
 
 .parameter {
@@ -11,32 +11,28 @@ body {
     border-bottom-color: black;
 }
 
-th {
+th,td {
     text-align: center;
-    border-right: 1px solid black;
-    border-bottom: 1px solid black;
-    border-top: 1px solid black;
-    letter-spacing: 2px;
     text-transform: uppercase;
-    padding: 6px 6px 6px 6px;
-    background-color: white;
-    line-height: 1.5em;
+    border-right-style: solid;
+    border-right-color: white;
+    border-right-width:1px;
 }
 
-td {
-    text-align: center;
-    border-right: 1px solid grey;
-    border-bottom: 1px solid grey;
-    padding: 6px 6px 6px 6px;
-    border-right: 1px solid grey;
-    line-height: 1.5em;
+.info{
+    width:70% !important
 }
 
 a {
     color: #31bc86;
     text-decoration: none;
 }
-
+.controls{
+    position:fixed;
+    width:25%;
+    left: 70%;
+    top:20px
+}
 a:hover,
 a:focus {
     color: #7c8d87;
