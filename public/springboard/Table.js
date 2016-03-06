@@ -1,4 +1,13 @@
 var Table = function(colorScheme) {
+    
+    
+    function refresh(column) {
+        //derive the url based on the column
+        var url = getUrl(column);
+        $.getJSON(url, function(json) {
+            this.render(this.data, column);
+        });
+    }
 
     var maxColMap = new Object();
     //a new Table class.
@@ -16,6 +25,7 @@ var Table = function(colorScheme) {
         this.columns.forEach(function(d) {
             that.heads.add(d);
         });
+        //<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
         this.tableHeader = d3.select("thead").append('tr').attr('id', 'header');
         this.tableHeader.selectAll('th').data(this.heads.list).enter().append("th").html(function(d) {
             return d;
@@ -27,9 +37,10 @@ var Table = function(colorScheme) {
             d3.selectAll('.zonehub').sort(sortingCriteria);
             d3.select('.parameter').classed('parameter', false);
             d3.select(this).classed('parameter', true);
+        }).append('span').classed('glyphicon', true).classed('glyphicon-refresh', true).attr('aria-hidden', true).on('click', function(c){
+            refresh(c);
         });
-        //{fixedOffset: $('#controls')}
-        $('table').stickyTableHeaders(/*{fixedOffset: $('body')}*/);
+        $('table').stickyTableHeaders( /*{fixedOffset: $('body')}*/ );
     }
 
 
@@ -37,25 +48,27 @@ var Table = function(colorScheme) {
     this.render = function(jsondata, column, sortFunction) {
         console.log('render with column:' + column);
         this.data = jsondata;
-        var rowZ = d3.selectAll("tbody").selectAll(".zonehub").data(this.data, function(d) {
+        var rowZ = d3.select("tbody").selectAll(".zonehub").data(this.data, function(d) {
             return d.id;
         });
-        renderNewRows(rowZ, column);
+        console.log("Present:" + rowZ.size());
+        console.log(rowZ.size() + "+" + rowZ.enter().size() + "+" + rowZ.exit().size() + "=" + (rowZ.size() + rowZ.enter().size() + rowZ.exit().size()) + ":" + jsondata.length);
         renderExistingRows(rowZ, column);
+        renderNewRows(rowZ, column);
         //console.log(maxColMap);
-        var hub = getMax(column);
-        highlightMax(column, hub);
+        var hub = getMax(rowZ,column);
+        highlightMax(rowZ,column, hub);
         //validate the constraint that jsondata.length ==selected .column's length
         d3.selectAll('.zonehub').sort(sortFunction);
-        //renderOldColumns(rowZ, column);
+        renderOldRows(rowZ, column);
 
     }
 
 
-    function getMax(column) {
+    function getMax(rowZ,column) {
         var max = -1;
         var id = -1;
-        d3.selectAll("." + column).each(function(d) {
+        rowZ.selectAll("." + column).each(function(d) {
             if (d3.select(this).html() !== '') {
                 var count = parseInt(d3.select(this).html());
                 if (count > max) {
@@ -71,11 +84,11 @@ var Table = function(colorScheme) {
         };
     }
 
-    function highlightMax(column, hub) {
+    function highlightMax(rowZ,column, hub) {
         d3.select("." + column + "-max").classed(column + "-max", false).style('background-color', 'white');
         var match = false;
         var debug = "";
-        d3.selectAll("." + column)
+        rowZ.selectAll("." + column)
             .filter(function(d) {
                 var html = d3.select(this).html();
                 var value = 0;
@@ -99,18 +112,24 @@ var Table = function(colorScheme) {
     }
 
     function renderExistingRows(rowZ, column) {
+        console.log("Present:" + rowZ.size());
         var cols = rowZ.selectAll('.' + column).data(function(r, i) {
             return [r];
         }, function(d) {
             return d.id;
         });
+        console.log(rowZ.size() + "=" + cols.size());
         cols.html(function(d) {
             return d.count;
-        }).classed(column, true);
+        }).classed(column, true).call(show, 'orange', 0);
     }
 
-    function renderOldColumns(rowZ, column) {
-        rowZ.exit().remove();
+    function renderOldRows(rowZ, column) {
+        console.log("Not updated :" + rowZ.exit().size());
+        rowZ.exit().selectAll('.' + column).filter(function(d) {
+            var html = d3.select(this).html();
+            return html !== '';
+        }).call(show, 'blue', 0);
     }
 
 
@@ -144,17 +163,28 @@ var Table = function(colorScheme) {
         }, function(d) {
             return d.count;
         });
-
+        console.log(rowZ.enter().size() + "=" + cols.size());
         cols.html(function(d) {
             return d.count;
+        }).call(show, 'green', 0);
+    }
+
+    function show(cur, color, delay) {
+        //alert(color);
+        this.style({
+            "border-right-width": '3px',
+            "border-right-color": color
         });
+        /*.transition().duration(2500).delay(delay).style({
+                    "border-right-width": '1px',
+                    "border-right-color": 'grey'
+                });*/
     }
 
 
-    this.refresh = function(url, column) {
-        $.getJSON(url, function(json) {
-            this.render(this.data, column);
-        });
+
+    function getUrl(column) {
+        return column;
     }
 
 }
