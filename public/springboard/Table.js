@@ -48,7 +48,6 @@ var Table = function(colorScheme) {
         //validate the constraint that jsondata.length ==selected .column's length
         d3.selectAll('.zonehub').sort(sortFunction);
         //renderOldColumns(rowZ, column);
-        $('table').stickyTableHeaders(/*{fixedOffset: $('body')}*/);
 
     }
 
@@ -79,9 +78,12 @@ var Table = function(colorScheme) {
         d3.selectAll("." + column)
             .filter(function(d) {
                 var html = d3.select(this).html();
-                debug = html;
-                if (d.count === hub.count && html !== '') {
-                    return true;
+                var value = 0;
+                if (!isNaN(html)) {
+                    value = parseInt(html);
+                    if (value === hub.count) {
+                        return true;
+                    }
                 }
                 return false;
             }).classed(column + "-max", true)
@@ -91,7 +93,7 @@ var Table = function(colorScheme) {
                 return colorScheme(column);
             });
         if (!match) {
-            console.log("Warning:" + hub.count + ":" + hub.id + ":" + debug);
+            console.error("Warning:" + hub.count + ":" + hub.id + ":" + debug);
         }
         console.log("Updated :" + column + "  with " + hub.count);
     }
