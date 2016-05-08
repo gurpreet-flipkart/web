@@ -1,0 +1,44 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+</head>
+
+<body>
+    <div id="chart"></div>
+    <script src="../javascripts/d3.min.js"></script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <style>
+        text {
+            font-size: 10px;
+            font-family: "Comic Sans MS", "Comic Sans", cursive;
+        }
+        
+        #labelG {
+            visibility: hidden
+        }
+    </style>
+    <div id="labelg">
+        <svg width="300" height="200">
+            <g transform="translate(140,100)" id="labelG">
+                <circle cx="0" cy="0" r="40" , fill="yellow" stroke-width="2" stroke="red"></circle>
+                <line x1="29" y1="29" x2="43" y2="43" stroke="red" stroke-width="2" />
+                <text x="43" y="43" fill="black">Color = CPD</text>
+                <line x1="-14" y1="14" x2="-60" y2="60" stroke="grey" stroke-width="2" />
+                <text x="-60" y="60" fill="black" text-anchor="middle">Color = Service Type</text>
+                <line x1="0" y1="0" x2="29" y2="-29" stroke="black" stroke-width="3" stroke-dasharray="3,3" />
+                <text x="29" y="-29" fill="black" text-anchor="start">Radius &infin; Count of Shipments</text>
+            </g>
+        </svg>
+    </div>
+    <script>
+        $(document).ready(function() {
+
+
+        });
+    </script>
+</body>
+
+</html>

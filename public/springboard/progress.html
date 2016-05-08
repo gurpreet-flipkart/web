@@ -1,0 +1,82 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+    <style>
+        progress[value] {
+            /* Reset the default appearance */
+            -webkit-appearance: none;
+            appearance: none;
+            width: 250px;
+            height: 10px;
+        }
+        
+        progress[value]::-webkit-progress-bar {
+            color: #0063a6;
+            font-size: .6em;
+            line-height: 1.5em;
+            text-indent: .5em;
+            width: 15em;
+            height: 1.8em;
+            border: 1px solid #0063a6;
+            
+            background-color: #eee;
+            border-radius: 2px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+        }
+        
+        progress::-webkit-progress-value {
+            background: orange;
+        }
+    </style>
+</head>
+
+<body>
+    <progress id="progressbar" max="100" value="0"><span class="progress-value"></span></progress>
+    <script>
+        $(document).ready(function() {
+            var progressbar = $('#progressbar'),
+                max = progressbar.attr('max'),
+                time = (1000 / max) * 5,
+                value = progressbar.val();
+
+            var loading = function() {
+                value += 1;
+                addValue = progressbar.val(value);
+
+                $('.progress-value').html(value + '%');
+
+                if (value == max) {
+                    clearInterval(animate);
+                }
+            };
+
+            var animate = setInterval(function() {
+                loading();
+            }, time);
+        });
+
+
+        var Progress = function(selector) {
+            var progressbar = $(selector),
+                max = progressbar.attr('max'),
+                time = (1000 / max) * 5,
+                value = progressbar.val();
+            this.to = function(val) {
+                value += 1;
+                addValue = progressbar.val(value);
+
+                $('.progress-value').html(value + '%');
+
+                if (value == val) {
+                    clearInterval(animate);
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

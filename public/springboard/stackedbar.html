@@ -1,0 +1,153 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="../javascripts/d3.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <style>
+        @import url(http://fonts.googleapis.com/css?family=Open+Sans:300,400);
+        body {
+            padding: 20px;
+        }
+        
+        *,
+        *:before,
+        *:after {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            outline: 0;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+        
+        table {
+            font-family: 'Open Sans', Helvetica;
+            -webkit-box-shadow: 10px 10px 16px -6px rgba(0, 0, 0, 0.75);
+            -moz-box-shadow: 10px 10px 16px -6px rgba(0, 0, 0, 0.75);
+            box-shadow: 10px 10px 16px -6px rgba(0, 0, 0, 0.75);
+            margin: 20px;
+        }
+        
+        table tr:nth-child(2n) {
+            background: #eff0f1;
+        }
+        
+        table tr:nth-child(2n+3) {
+            background: #fff;
+        }
+        
+        table th,
+        table td {
+            padding: 1em;
+            width: 10em;
+        }
+        
+        .days,
+        .time {
+            background: #34495e;
+            text-transform: uppercase;
+            font-size: 0.6em;
+            text-align: center;
+            color: white
+        }
+        
+        .time {
+            width: 3em !important;
+        }
+        
+    </style>
+</head>
+
+<body>
+    <table id="secondary-station" border='0' cellpadding='0' cellspacing='0'>
+        <caption>Secondary Stations View</caption>
+        <thead>
+            <tr class='days'>
+                <th>Station</th>
+                <th>&lt;30 mins</th>
+                <th>30mins-60mins</th>
+                <th>&gt;60mins</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <table id="bagging-station" border='0' cellpadding='0' cellspacing='0'>
+        <caption>Bagging Stations View</caption>
+        <thead>
+            <tr class='days'>
+                <th>Station</th>
+                <th>&lt;30 mins</th>
+                <th>30mins-60mins</th>
+                <th>&gt;60mins</th>
+            </tr>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <script>
+        var timeslots = ['<30mins', '30-60 mins', '>60mins'];
+        $(document).ready(function() {
+            var json = [];
+            var types = ['secondary-station', 'bagging-station'];
+            types.forEach(function(e) {
+                var data = [];
+                for (var i = 0; i < 10; i++) {
+                    var times = [];
+                    for (var j = 0; j < 3; j++) {
+                        times.push({
+                            timeslot: timeslots[j],
+                            count: parseInt(Math.random() * 100),
+                            station: "station" + i
+                        });
+                    }
+                    data.push({
+                        station: "station" + i,
+                        timeslots: times
+                    });
+                };
+                json.push({
+                    stationType: e,
+                    data: data
+                });
+            });
+            renderStationView(json[0].data, 'secondary-station');
+            renderStationView(json[1].data, 'bagging-station');
+
+            setInterval(function() {
+                var type = parseInt(Math.random() * types.length);
+                var data = json[type].data;
+                for (var t = 1; t <= 5; t++) {
+                    var stationId = parseInt(Math.random() * data.length);
+                    var ts = data[stationId].timeslots;
+                    var randomTimeslot = parseInt(Math.random() * ts.length);
+                    ts[randomTimeslot].count = parseInt(Math.random() * 100);
+                    console.log('updating station ' + stationId + "'s timeslot: " + timeslots[randomTimeslot] + " with " + ts[randomTimeslot].count);
+                }
+                renderStationView(data, types[type]);
+            }, 5 * 1000);
+
+            function renderStationView(data, stationType) {
+                var newRowz = d3.select('#' + stationType + '>tbody')
+                    .selectAll('.station').data(data).enter().append('tr').classed('station', true);
+                newRowz.append('td').html(function(d) {
+                    return d.station;
+                }).classed('time', true)
+                newRowz.selectAll('td.timeslot').data(function(d) {
+                    return d.timeslots;
+                }).enter().append('td').classed('timeslot', true);
+                d3.select('#' + stationType + '>tbody').selectAll('.timeslot').html(function(d) {
+                    return d.count;
+                });
+
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -11,6 +11,7 @@
     <script src="jquery.stickytableheaders.js"></script>
     <link rel="stylesheet" href="mystyle.css">
     <script src="Table.js"></script>
+    <script src="Highlight.js"></script>
 
 
     <!-- Material Design fonts -->
@@ -23,11 +24,9 @@
     <!-- Bootstrap Material Design -->
     <link rel="stylesheet" type="text/css" href="dist/css/bootstrap-material-design.css">
     <link rel="stylesheet" type="text/css" href="dist/css/ripples.min.css">
-    <!--<link rel="stylesheet" type="text/css" href="jquery.dropdown.css">-->
 
     <script src="dist/js/material.min.js"></script>
     <script src="dist/js/ripples.min.js"></script>
-    <!--<script src="jquery.dropdown.js"></script>-->
 
 
 </head>
@@ -64,11 +63,15 @@
                     </select>
                 </div>
             </div>
+            <a href="javascript:void(0)" class="btn btn-raised btn-success">Submit</a>
         </div>
     </div>
     <div class="info panel panel-primary">
         <div class="panel-heading">SFC Filters</div>
         <div class="panel-body">
+            <div class="progress progress-striped active">
+                <div class="progress-bar" style="width: 45%"></div>
+            </div>
             <table class="table">
                 <thead></thead>
                 <tbody></tbody>
@@ -117,8 +120,9 @@
             var colorsArr = ['#F44336', '#FF80AB', '#9575CD', '#2196F3',
                 '#03A9F4', '#00BCD4', '#009688', '#4CAF50', '#CDDC39', '#FFC107', '#FF9800', '#9E9E9E', '#607D8B'
             ];
+            var colorScheme=shuffle(colorsArr);
             var zoneColor = d3.scale.ordinal().domain('North', 'East', 'West',
-                'South').range(shuffle(colorsArr));
+                'South').range(colorScheme);
             var zones = ['North', 'South', 'East', 'West'];
             var table = new Table(zoneColor);
             table.headers(["zone", "Hub name"]);

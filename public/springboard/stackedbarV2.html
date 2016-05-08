@@ -1,0 +1,195 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <style>
+        body {
+            font: 10px sans-serif;
+        }
+        
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+        
+        .x.axis path {
+            display: none;
+        }
+        
+        .station {
+            -webkit-box-shadow: 10px 10px 15px -2px rgba(0, 0, 0, 0.75);
+            -moz-box-shadow: 10px 10px 15px -2px rgba(0, 0, 0, 0.75);
+            box-shadow: 10px 10px 15px -2px rgba(0, 0, 0, 0.75);
+            /*border-bottom:2px solid black; */
+        }
+        
+        .type {
+            clear: both;
+            margin: 20px;
+        }
+    </style>
+    <script src="../javascripts/d3.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+</head>
+
+<body>
+    <div id='secondary-station' class='type'>
+        <h4>Secondary Station View</h4>
+    </div>
+    <div id='bagging-station' class='type'>
+        <h4>Bagging Station View</h4>
+    </div>
+    <script>
+        var margin = {
+            top: 20,
+            right: 20,
+            bottom: 30,
+            left: 40
+        };
+        var stationHeight = 100;
+        var stationWidth = 100;
+        var x0 = d3.scale.ordinal()
+            .rangeRoundBands([0, stationWidth + margin.left], .1);
+
+        var x1 = d3.scale.ordinal();
+
+        var y = d3.scale.linear()
+            .range([stationHeight, 0]);
+
+        var color = d3.scale.ordinal()
+            .range(['red', 'green', 'yellow']);
+
+        var xAxis = d3.svg.axis()
+            .scale(x0)
+            .orient("bottom");
+
+        var yAxis = d3.svg.axis()
+            .scale(y)
+            .orient("left")
+            .ticks(4);
+        //.tickFormat(d3.format(".2s"));
+        var timeslots = ['<30mins', '30-60 mins', '>60mins'];
+        $(document).ready(function() {
+            var json = [];
+            var types = ['secondary-station', 'bagging-station'];
+            types.forEach(function(e) {
+                var data = [];
+                for (var i = 0; i < 10; i++) {
+                    var times = [];
+                    for (var j = 0; j < 3; j++) {
+                        times.push({
+                            timeslot: timeslots[j],
+                            count: parseInt(Math.random() * 100)
+                        });
+                    }
+                    data.push({
+                        station: "station" + i,
+                        timeslots: times
+                    });
+                };
+                json.push({
+                    stationType: e,
+                    data: data
+                });
+            });
+
+            json.forEach(function(stationTypeData) {
+                renderStationView(stationTypeData.data, stationTypeData.stationType);
+            });
+            setInterval(function() {
+                var type = parseInt(Math.random() * types.length);
+                var data = json[type].data;
+                for (var t = 1; t <= 5; t++) {
+                    var stationId = parseInt(Math.random() * data.length);
+                    var ts = data[stationId].timeslots;
+                    var randomTimeslot = parseInt(Math.random() * ts.length);
+                    ts[randomTimeslot].count = parseInt(Math.random() * 100);
+                    console.log('updating station ' + stationId + "'s timeslot: " + timeslots[randomTimeslot] + " with " + ts[randomTimeslot].count);
+                }
+                renderStationView(data, types[type]);
+            }, 5 * 1000);
+
+
+        });
+
+
+
+        function renderStationView(data, stationType) {
+            x0.domain(data[0].timeslots.map(function(d) {
+                return d.timeslot;
+            }));
+            console.log(x0.domain());
+            y.domain([0, d3.max(data, function(d) {
+                return d3.max(d.timeslots, function(d) {
+                    return d.count;
+                });
+            })]);
+            console.log(data);
+
+            d3.select('#' + stationType).selectAll('.station').data(data).enter().append('div').classed('station', true)
+                .style({
+                    'width': stationWidth + margin.left + margin.right,
+                    'height': stationHeight + margin.top + margin.bottom,
+                    'float': 'left'
+                })
+                .append('svg')
+                .append('g')
+                .classed('stationG', true)
+                .attr("transform", "translate(" + margin.top + "," + margin.right + ")")
+                .append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 6)
+                .attr("dy", ".71em")
+                .style("text-anchor", "end")
+                .text("count");
+            d3.selectAll('.stationG').selectAll('.bar').data(function(d) {
+                    return d.timeslots;
+                })
+                .enter()
+                .append('rect')
+                .classed('bar', true)
+                .attr('y', function(d) {
+                    return y(d.count);
+                })
+                .attr('width', x0.rangeBand())
+                .attr('height', function(d) {
+                    return stationHeight - y(d.count);
+                })
+                .style('fill', function(d) {
+                    return color(d.timeslot);
+                }).style('opacity', 0.75)
+                .attr("stroke-width", 1)
+                .attr("stroke", 'black');
+
+            d3.selectAll('.stationG').selectAll('.bar').attr('x', function(d) {
+                    return x0(d.timeslot);
+                }).transition()
+                .ease('linear')
+                .duration(4000)
+                .attr('y', function(d) {
+                    return y(d.count);
+                })
+                .attr('height', function(d) {
+                    return stationHeight - y(d.count);
+                });
+
+
+
+
+            /*d3.selectAll('.stationG').append('line')
+                .attr('x1', 0).attr('y1', stationHeight).attr('x2', stationWidth).attr('y2', stationHeight)
+                .attr("stroke-width", 2)
+                .attr("stroke", 'black');*/
+
+            d3.selectAll('.stationG')
+                .classed('y', true)
+                .classed('axis', true)
+                .call(yAxis);
+        }
+    </script>
+</body>
+
+</html>

@@ -6,21 +6,20 @@ body {
 }
 
 .parameter {
-    border-bottom-style: solid;
-    border-bottom-width: 4px;
-    border-bottom-color: black;
+    border-bottom-style: solid !important; 
+    border-bottom-width: 3px  !important ;
+    border-bottom-color: black  !important;
 }
 
 th,td {
     text-align: center;
-    text-transform: uppercase;
     border-right-style: solid;
     border-right-color: white;
     border-right-width:1px;
 }
 
 .info{
-    width:70% !important
+    width:70% !important;
 }
 
 a {

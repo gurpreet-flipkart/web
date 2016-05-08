@@ -1,6 +1,6 @@
 var Table = function(colorScheme) {
-    
-    
+
+
     function refresh(column) {
         //derive the url based on the column
         var url = getUrl(column);
@@ -37,10 +37,10 @@ var Table = function(colorScheme) {
             d3.selectAll('.zonehub').sort(sortingCriteria);
             d3.select('.parameter').classed('parameter', false);
             d3.select(this).classed('parameter', true);
-        }).append('span').classed('glyphicon', true).classed('glyphicon-refresh', true).attr('aria-hidden', true).on('click', function(c){
+        }).append('span').classed('glyphicon', true).classed('glyphicon-refresh', true).attr('aria-hidden', true).on('click', function(c) {
             refresh(c);
         });
-        $('table').stickyTableHeaders( /*{fixedOffset: $('.stick')}*/ );
+        $('table').stickyTableHeaders( /*{fixedOffset: $('.info')}*/ );
     }
 
 
@@ -63,7 +63,6 @@ var Table = function(colorScheme) {
         renderOldRows(rowZ, column);
 
     }
-
 
     function getMax(column) {
         var max = -1;
@@ -137,11 +136,12 @@ var Table = function(colorScheme) {
         var that = colorScheme;
         var newRowz = rowZ.enter().append('tr').classed('zonehub', true).attr("id", function(d) {
             return 'h-' + d.id;
-        });/*.on('mouseover', function(d) {
-            d3.select(this).style('opacity', 1.0);
-        }).on('mouseout', function(d) {
-            d3.select(this).style('opacity', 0.75);
-        }).style('opacity', 0.75);*/
+        });
+        /*.on('mouseover', function(d) {
+                    d3.select(this).style('opacity', 1.0);
+                }).on('mouseout', function(d) {
+                    d3.select(this).style('opacity', 0.75);
+                }).style('opacity', 0.75);*/
         //adding new column for zone.
         newRowz.append('td')
             .html(function(d) {
