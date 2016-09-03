@@ -1,0 +1,248 @@
+<html lang="en">
+
+<head>
+    <style type="text/css">
+        .gm-style .gm-style-mtc label,
+        .gm-style .gm-style-mtc div {
+            font-weight: 400
+        }
+    </style>
+    <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+    <style type="text/css">
+        .gm-style .gm-style-cc span,
+        .gm-style .gm-style-cc a,
+        .gm-style .gm-style-mtc div {
+            font-size: 10px
+        }
+    </style>
+    <style type="text/css">
+        #mapid {
+            height: 100%;
+        }
+        
+        @media print {
+            .gm-style .gmnoprint, .gmnoprint {
+                display: none
+            }
+        }
+        
+        @media screen {
+            .gm-style .gmnoscreen, .gmnoscreen {
+                display: none
+            }
+        }
+    </style>
+    <style type="text/css">
+        .gm-style {
+            font-family: Roboto, Arial, sans-serif;
+            font-size: 11px;
+            font-weight: 400;
+            text-decoration: none
+        }
+        
+        .gm-style img {
+            max-width: none
+        }
+    </style>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css">
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+
+
+
+    <!-- HTML5 s/ekl-compass/him and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+
+        <![endif]-->
+    <title>FE Tracker</title>
+</head>
+
+<body>
+    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+    <script src="http://leaflet.github.io/Leaflet.heat/dist/leaflet-heat.js"></script>
+    <script src="https://d3js.org/d3-array.v1.min.js"></script>
+    <div id="mapid"></div>
+    <script>
+        var data = [];
+        data.push({
+            lat: 28.61,
+            long: 77.2
+        });
+
+        var scale = (L.Browser.retina == true) ? 2 : 1;
+        var ourlayer = L.tileLayer('https://maps.flipkart.com/{z}/{x}/{y}.png?scale={scale}', {
+            maxZoom: 19,
+            attribution: '<a href="http://www.flipkart.com/" target="_blank">&copy; Flipkart 2016</a>',
+            scale: scale
+        });
+        var mymap = L.map('mapid', {
+            center: [18.929863, 72.833427],
+            zoom: 5,
+            layers: ourlayer
+        });
+
+        function onEachFeature(feature, layer) {
+            // does this feature have a property named popupContent?
+            if (feature.properties && feature.properties.popupContent) {
+                layer.bindPopup(feature.properties.popupContent);
+            }
+        }
+        d3.json("facilites_geo.json", function(geo_data) {
+            var t = geo_data.filter(function(d) {
+                return d.latlong[0] !== null && d.latlong[1] !== null;
+            });
+            var data = t.map(function(d) {
+                if (d.state === 'Karnataka') {
+                    d.metric = 50 + Math.random() * 50;
+                } else if (d.state === 'Delhi') {
+                    d.metric = 25 + Math.random() * 25;
+                } else if (d.state === 'Maharashtra') {
+                    d.metric = 0.1;
+                } else {
+                    d.metric = Math.random() * 25;
+                }
+                return [d.latlong[1], d.latlong[0], d.metric];
+            });
+
+
+            function color(d) {
+                if (d >= 50) {
+                    return "red";
+                } else if (d>= 25 && d< 50) {
+                    return "orange";
+                } else if (d < 25) {
+                    return "green";
+                }
+            }
+            var geoJsonAray = t.map(function(d) {
+                return {
+                    "type": "Feature",
+                    "properties": {
+                        "name": d.name,
+                        "state": d.state,
+                        "popupContent": d.type + '-' + d.name,
+                        "color": color(d.metric)
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [d.latlong[0], d.latlong[1]]
+                    }
+                };
+            });
+            
+            
+            var geojsonMarkerOptions = {
+                radius: 3,
+                weight: 1,
+                opacity: 0,
+                fillOpacity: 0
+            };
+
+            var high = data.filter(function(d) {
+                return d[2] >= 50;
+            });
+            var med = data.filter(function(d) {
+                return d[2] >= 25 && d[2] < 50;
+            });
+            var low = data.filter(function(d) {
+                return d[2] < 25;
+            });
+            plot(low, 'green');
+            plot(med, 'orange');
+            plot(high, 'red');
+
+            L.geoJson(geoJsonAray, {
+                onEachFeature: onEachFeature,
+                pointToLayer: function(feature, latlng) {
+                    return L.circleMarker(latlng, geojsonMarkerOptions);
+                }/*,
+                style: function(feature) {
+                    return {
+                        color: feature.properties.color,
+                        fillColor: feature.properties.color
+                    }
+                }*/
+            }).addTo(mymap);
+        });
+
+        function plot(data, color) {
+            var heat = L.heatLayer(data, {
+                "radius": 14, // default value
+                "blur": 6, // default value
+                "max": 1,
+                maxZoom: 12,
+                "scaleRadius": true,
+                gradient: {
+                    1: color
+                }
+                // Values can be set for a scale of 0-1
+            }).addTo(mymap);
+        }
+        /**/
+        //mymap.touchZoom.disable();
+        //mymap.doubleClickZoom.disable();
+        //mymap.scrollWheelZoom.disable();
+        //mymap.boxZoom.disable();
+        //mymap.keyboard.disable();
+        //mymap._initPathRoot();
+        /*var svg = d3.select("#mapid").select("svg"),
+            g = svg.append("g");
+        d3.json("circles.json", function(collection) {
+    
+            console.log(collection);
+            collection.objects.forEach(function(d) {
+                d.LatLng = new L.LatLng(d.circle.coordinates[0],
+                    d.circle.coordinates[1])
+            })
+
+            var feature = g.selectAll("circle")
+                .data(collection.objects)
+                .enter().append("circle")
+                .style("opacity", .6)
+                .style("fill", function(d) {
+                    if (d.circle.metric >= collection.threshold) {
+                        return "#ff7f7f";
+                    }
+                    return "#9cff99";
+                })
+                .style('stroke', function(d) {
+                    if (d.circle.metric >= collection.threshold) {
+                        return "red";
+                    }
+                    return "green";
+                })
+                .style("stroke-width", 2);
+
+            mymap.on("viewreset", update);
+            update();
+
+            function update() {
+                feature.attr("transform",
+                    function(d) {
+                        return "translate(" +
+                            mymap.latLngToLayerPoint(d.LatLng).x + "," +
+                            mymap.latLngToLayerPoint(d.LatLng).y + ")";
+                    }
+                )
+                feature.attr("r", 0)
+                    .transition().ease("elastic").duration(3000).delay(1500)
+                    .attr("r", function(d) {
+                        return d.circle.metric;
+                    });
+            }
+            
+        })*/
+    </script>
+
+</body>
+
+</html>

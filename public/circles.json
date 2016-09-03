@@ -1,0 +1,7 @@
+{"objects":[
+{"circle":{"city":"delhi","coordinates":[28.61, 77.2],"metric":10}},
+{"circle":{"city":"bangalore","coordinates":[12.972442,77.580643],"metric":7}},
+{"circle":{"city":"chennai","coordinates":[13.067439,80.237617],"metric":8}},
+{"circle":{"city":"chandigarh","coordinates":[30.74148,76.768066],"metric":15}},
+{"circle":{"city":"mumbai","coordinates":[18.92 9863,72.833427],"metric":30}}
+], "threshold":9}

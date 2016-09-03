@@ -1,0 +1,81 @@
+html, body {
+    height: 100%;
+}
+
+#map-canvas {
+    height: 100%;
+    width: 100%;
+}
+
+.filter-button {
+    position: absolute;
+    transform: rotate(90deg);
+    top: 100px;
+    right: -37px;
+    z-index: 10001;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    padding: 5px 30px;
+}
+
+.filter-panel {
+    height: 100%;
+    width: 0;
+    border-left: 2px solid #4cae4c;
+    float: left;
+    z-index: 10000;
+    padding: 5px 10px;
+    position: relative;
+}
+
+.maps-panel {
+    width: 100%;
+    position: relative;
+    float: left;
+}
+
+.tab-panel {
+    margin-top: 20px;
+    z-index: -10;
+}
+
+.range-text {
+    z-index: -10;
+}
+
+
+.info tr td:first-child {
+    padding-right: 10px;
+    min-width: 100px;
+}
+.timeago {
+    color: #888;
+}
+
+.btn-apply {
+    position: relative;
+    right: -290px;
+    top: 50px;
+}
+
+.loading {
+    display: none;
+    color: #888;
+}
+
+.agent-results {
+    max-height: 500px;
+    overflow-y: scroll;
+    z-index: -10;
+}
+
+.inner-message{
+    position: absolute;
+    left: 20px;
+    top: 100px;
+    z-index: -1;
+}
+
+.notifyjs-corner {
+    z-index: 1000000;
+}

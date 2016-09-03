@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <title>Shipment Journey</title>
+
+    <!-- Google fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+
+    <!-- D3.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+    <script src="d3.array.0.7.min.js"></script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+
+    <style>
+        .tooltip {
+            font-family: "Comic Sans MS" !important;
+            opacity: .9;
+            font-size: 12px;
+            padding: 10px;
+            width: 250px;
+            line-height: 1;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            border-radius: 7px;
+            border-style: solid;
+            border-color: #e4e4e4;
+            border-width: 2px;
+        }
+        /* Creates a small triangle extender for the tooltip */
+        
+        .tooltip:after {
+            box-sizing: border-box;
+            display: inline;
+            font-size: 10px;
+            width: 100%;
+            line-height: 1;
+            color: rgba(0, 0, 0, 0.8);
+            content: "\25BC";
+            position: absolute;
+            text-align: center;
+        }
+        /* Style northward tooltips differently */
+        
+        .tooltip.n:after {
+            margin: -1px 0 0 0;
+            top: 100%;
+            left: 0;
+        }
+        
+        text {
+            font-size: 10px;
+            font-family: "Comic Sans MS", "Comic Sans", cursive;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id='journey'>
+    </div>
+    <script>
+        var tooltip = d3.tip()
+            .attr('class', 'tooltip')
+            .offset([-10, 0])
+            .html(function(d) {
+                var content = "<span class=\"name\">Status   :</span><span class=\"stage\">" + d.status + "</span><br/>";
+                content += "<span class=\"name\">updated_at   :</span><span class=\"count\">" + d.updatedAt + "</span><br/>";
+                return content;
+            });
+
+        var facilityToolTip = d3.tip()
+            .attr('class', 'tooltip')
+            .offset([-10, 0])
+            .html(function(d) {
+                var content = "<span class=\"name\">Hub   :</span><span class=\"stage\">" + d.hub + "</span><br/>";
+                return content;
+            });
+
+
+        var bagToolTip = d3.tip()
+            .attr('class', 'tooltip')
+            .offset([-10, 0])
+            .html(function(d) {
+                var content = "<span class=\"name\">bag   :</span><span class=\"stage\">" + d.bag + "</span><br/>";
+                return content;
+            });
+
+
+        var data = [{
+            'status': 'Expected',
+            'hubId': 278,
+            "facility_type": "motherhub",
+            'updatedAt': "2016-08-29 20:24:20"
+        }, {
+            'status': 'InScan_Success',
+            'hubId': 278,
+            "facility_type": "motherhub",
+            'updatedAt': '2016-08-29 20:24:20'
+        }, {
+            'status': 'Received',
+            'hubId': 278,
+            "facility_type": "motherhub",
+            'updatedAt': '2016-08-29 20:27:56'
+        }, {
+            'status': 'Undelivered_Not_Attended',
+            'hubId': 278,
+            "facility_type": "motherhub",
+            'updatedAt': '2016-08-29 22:27:56'
+        }, {
+            'status': 'Expected',
+            'hubId': 119,
+            "facility_type": "motherhub",
+            'updatedAt': '2016-08-30 04:00:41'
+        }, {
+            'status': 'Expected',
+            'hubId': 119,
+            "facility_type": "motherhub",
+            'updatedAt': '2016-08-30 04:00:41'
+        }, {
+            'status': 'Recieved',
+            'hubId': 119,
+            "facility_type": "motherhub",
+            'updatedAt': '2016-08-30 18:52:54'
+        }, {
+            'status': 'Undelivered_Not_Attended',
+            'hubId': 119,
+            "facility_type": "motherhub",
+            'updatedAt': '2016-08-30 18:52:54'
+        }, {
+            'status': 'Expected',
+            'hubId': 2270,
+            "facility_type": "motherhub",
+            'updatedAt': '2016-08-31 01:41:04'
+        }, {
+            'status': 'Received',
+            'hubId': 2270,
+            "facility_type": "DELIVERY_HUB",
+            'updatedAt': '2016-08-31 05:23:24'
+        }, {
+            'status': 'Undelivered_Incomplete_Address',
+            'hubId': 2270,
+            "facility_type": "DELIVERY_HUB",
+            'updatedAt': '2016-08-31 10:47:15'
+        }, {
+            'status': 'Undelivered_Incomplete_Address',
+            'hubId': 2270,
+            "facility_type": "DELIVERY_HUB",
+            'updatedAt': '2016-09-01 16:29:27'
+        }, {
+            'status': 'Undelivered_Incomplete_Address',
+            'hubId': 2270,
+            "facility_type": "DELIVERY_HUB",
+            'updatedAt': '2016-09-01 16:29:41'
+        }, {
+            'status': 'Undelivered_Incomplete_Address',
+            'hubId': 2270,
+            "facility_type": "DELIVERY_HUB",
+            'updatedAt': '2016-09-03 11:10:13'
+        }];
+
+        var bags = [{
+            'bagid': "22046017",
+            "hubid": 278,
+            "facility_type": "motherhub",
+            'updatedAt': "2016-08-29 20:46:37",
+            'status': 'OPEN'
+        }, {
+            'bagid': 22046017,
+            "hubid": 278,
+            "facility_type": "motherhub",
+            'updatedAt': "2016-08-29 20:46:40",
+            'status': 'CLOSED'
+        }, {
+            'bagid': 22046017,
+            "hubid": 278,
+            "facility_type": "motherhub",
+            'updatedAt': "2016-08-30 04:00:01",
+            'status': 'INTRANSIT'
+        }, {
+            'bagid': 22046017,
+            "hubid": 278,
+            "facility_type": "motherhub",
+            'updatedAt': "2016-08-30 13:30:02",
+            'status': 'REACHED'
+        }, {
+            'bagid': 22046017,
+            "hubid": 278,
+            "facility_type": "motherhub",
+            'updatedAt': "2016-08-30 18:52:37",
+            'status': 'RECEIVED'
+        }, {
+            'bagid': 22087601,
+            "hubid": 119,
+            'updatedAt': "2016-08-31 00:17:30",
+            'status': 'OPEN'
+        }, {
+            'bagid': 22087601,
+            "hubid": 119,
+            "facility_type": "motherhub",
+            'updatedAt': "2016-08-31 00:17:33",
+            'status': 'CLOSED'
+        }, {
+            'bagid': 22087601,
+            "hubid": 119,
+            "facility_type": "motherhub",
+            'updatedAt': "2016-08-31 01:41:00",
+
+            'status': 'INTRANSIT'
+        }, {
+            'bagid': 22087601,
+            "hubid": 2270,
+            "facility_type": "DELIVERY_HUB",
+            'updatedAt': "2016-08-31 05:18:38",
+            'status': 'REACHED'
+        }, {
+            'bagid': 22087601,
+            "hubid": 2270,
+            "facility_type": "DELIVERY_HUB",
+            'updatedAt': "2016-08-31 05:22:03",
+            'status': 'RECEIVED'
+        }];
+        var timeFormat = d3.time.format('%Y-%m-%d %H:%M:%S');
+        var perFacility = d3.nest().key(function(d) {
+            console.log(d.hubId);
+            return d.hubId;
+        }).entries(data).filter(function(d) {
+            return d.values.length >= 2;
+        }).map(function(d) {
+            console.log(d);
+            return {
+                'hub': d.key,
+                'start': d3.min(d.values, function(d) {
+                    return timeFormat.parse(d.updatedAt);
+                }),
+                'end': d3.max(d.values, function(d) {
+                    return timeFormat.parse(d.updatedAt);
+                })
+            }
+        });
+
+
+
+        var margin = {
+                top: 100,
+                right: 40,
+                bottom: 30,
+                left: 80
+            },
+            width = 2000 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
+        var color = d3.scale.category10();
+        var svg = d3.select("body").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        var extent = d3.extent(data, function(d) {
+            return timeFormat.parse(d.updatedAt);
+        });
+
+        var timescale = d3.time.scale().domain(extent).range([0, 1200]);
+        drawEvents('shipment', data, false);
+        drawHubScopes(perFacility, height - 50);
+
+        drawBagEvent(bags);
+        var byBag = d3.nest().key(function(d) {
+            return d.bagid;
+        }).entries(bags);
+        
+        
+        var bagScopes = byBag.filter(function(d) {
+            return d.values.length >= 2;
+        }).map(function(d) {
+            return {
+                'bag': d.key,
+                'start': d3.min(d.values, function(d) {
+                    return timeFormat.parse(d.updatedAt);
+                }),
+                'end': d3.max(d.values, function(d) {
+                    return timeFormat.parse(d.updatedAt);
+                })
+            }
+        });
+
+        drawBagScopes(bagScopes, height - 110);
+        svg.call(tooltip);
+        svg.call(facilityToolTip);
+        svg.call(bagToolTip);
+        console.log(bagScopes);
+
+        function drawEvents(clazz, events, striped) {
+
+            var selected = svg.selectAll('.' + clazz).data(events).enter().append("line").classed(clazz, true);
+            selected.attr("x1", function(d) {
+                    return timescale(timeFormat.parse(d.updatedAt));
+                })
+                .attr("y1", 0)
+                .attr("x2", function(d) {
+                    return timescale(timeFormat.parse(d.updatedAt));
+                })
+                .attr("y2", height)
+                .attr("stroke-width", 2)
+                .attr("stroke-dasharray", "10,10")
+                .attr("stroke", function(d) {
+                    return color(d.status);
+                }).on('mouseover', function(d) {
+                    tooltip.show(d);
+                }).on('mouseout', function(d) {
+                    tooltip.hide(d);
+                });
+            if (striped) {
+                selected.attr("stroke-dasharray", "10,10");
+            }
+        }
+
+
+        function drawBagEvent(bags) {
+            console.log(bags);
+            var selected = svg.selectAll('.bagevent').data(bags).enter();
+            selected.append("rect").classed('bagevent', true).attr("x", function(d) {
+                    return timescale(timeFormat.parse(d.updatedAt)) - 2;
+                })
+                .attr("y", 100)
+                .attr("width", 4)
+                .attr("height", height - 200)
+                .attr("stroke-width", 2)
+                .attr("stroke-dasharray", "10,10")
+                .attr("fill", function(d) {
+                    return color(d.status);
+                })
+                .attr("stroke", function(d) {
+                    return color(d.status);
+                }).on('mouseover', function(d) {
+                    tooltip.show(d);
+                }).on('mouseout', function(d) {
+                    tooltip.hide(d);
+                });
+
+        }
+
+
+
+        function drawHubScopes(perFacility, height) {
+            svg.selectAll('.hub').data(perFacility).enter().append("rect")
+                .classed('hub', true)
+                .attr("x", function(d) {
+                    console.log(d);
+                    return timescale(d.start) - 5;
+                })
+                .attr("y", height)
+                .attr("width", function(d) {
+                    var x = timescale(d.end) - timescale(d.start) + 10;
+                    console.log(x);
+                    return x;
+                })
+                .attr("height", 50)
+                .attr('fill', function(d) {
+                    return color(d.hub);
+                })
+                .style('opacity', 0.6)
+                .on('mouseover', function(d) {
+                    facilityToolTip.show(d);
+                }).on('mouseout', function(d) {
+                    facilityToolTip.hide(d);
+                });
+        }
+
+
+        function drawBagScopes(bag, height) {
+            svg.selectAll('.bag').data(bag).enter().append("rect")
+                .attr("x", function(d) {
+                    console.log(d);
+                    return timescale(d.start) - 5;
+                })
+                .attr("y", height)
+                .attr("width", function(d) {
+                    var x = timescale(d.end) - timescale(d.start) + 10;
+                    console.log(x);
+                    return x;
+                })
+                .attr("height", 50)
+                .attr('fill', function(d) {
+                    return color(d.bag);
+                })
+                .style('opacity', 0.6)
+                .on('mouseover', function(d) {
+                    bagToolTip.show(d);
+                }).on('mouseout', function(d) {
+                    bagToolTip.hide(d);
+                });
+        }
+        
+    </script>
+</body>
+
+</html>
