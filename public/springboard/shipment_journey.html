@@ -72,29 +72,11 @@
                 return content;
             });
 
-        var facilityToolTip = d3.tip()
+        var scopeTip = d3.tip()
             .attr('class', 'tooltip')
             .offset([-10, 0])
             .html(function(d) {
-                var content = "<span class=\"name\">Hub   :</span><span class=\"stage\">" + d.hub + "</span><br/>";
-                return content;
-            });
-
-
-        var bagToolTip = d3.tip()
-            .attr('class', 'tooltip')
-            .offset([-10, 0])
-            .html(function(d) {
-                var content = "<span class=\"name\">bag   :</span><span class=\"stage\">" + d.bag + "</span><br/>";
-                return content;
-            });
-        
-        
-        var consignmentToolTip = d3.tip()
-            .attr('class', 'tooltip')
-            .offset([-10, 0])
-            .html(function(d) {
-                var content = "<span class=\"name\">consignment   :</span><span class=\"stage\">" + d.consignment + "</span><br/>";
+                var content = "<span class=\"name\">scope   :</span><span class=\"stage\">" + d.id + "</span><br/>";
                 return content;
             });
 
@@ -274,7 +256,7 @@
         }).map(function(d) {
             console.log(d);
             return {
-                'hub': d.key,
+                'id': d.key,
                 'start': d3.min(d.values, function(d) {
                     return timeFormat.parse(d.updatedAt);
                 }),
@@ -306,7 +288,7 @@
 
         var timescale = d3.time.scale().domain(extent).range([0, 1200]);
         drawEvents('shipment', data, false);
-        drawHubScopes(perFacility, height - 50);
+        drawScopes('hub', perFacility, height - 50, 50);
 
         var byBag = d3.nest().key(function(d) {
             return d.bagid;
@@ -317,7 +299,7 @@
             return d.values.length >= 2;
         }).map(function(d) {
             return {
-                'bag': d.key,
+                'id': d.key,
                 'start': d3.min(d.values, function(d) {
                     return timeFormat.parse(d.updatedAt);
                 }),
@@ -334,7 +316,7 @@
             return d.values.length >= 2;
         }).map(function(d) {
             return {
-                'consignment': d.key,
+                'id': d.key,
                 'start': d3.min(d.values, function(d) {
                     return timeFormat.parse(d.updatedAt);
                 }),
@@ -346,18 +328,16 @@
 
 
 
-        drawBagScopes(bagScopes, 200);
+        drawScopes('bag',bagScopes, 200, 100);
         drawBagEvent(bags, 170);
 
-        drawConsignmentScopes(consignmentScopes, 50);
+        drawScopes('consignment', consignmentScopes, 50, 100);
         drawConsignmentEvent(consignments, 0);
 
 
 
         svg.call(tooltip);
-        svg.call(facilityToolTip);
-        svg.call(bagToolTip);
-        svg.call(consignmentToolTip);
+        svg.call(scopeTip);
         console.log(bagScopes);
 
         function drawEvents(clazz, events, striped) {
@@ -387,30 +367,7 @@
 
 
 
-        function drawHubScopes(perFacility, h) {
-            svg.selectAll('.hub').data(perFacility).enter().append("rect")
-                .classed('hub', true)
-                .attr("x", function(d) {
-                    console.log(d);
-                    return timescale(d.start) - 5;
-                })
-                .attr("y", h)
-                .attr("width", function(d) {
-                    var x = timescale(d.end) - timescale(d.start) + 10;
-                    console.log(x);
-                    return x;
-                })
-                .attr("height", 50)
-                .attr('fill', function(d) {
-                    return color(d.hub);
-                })
-                .style('opacity', 0.8)
-                .on('mouseover', function(d) {
-                    facilityToolTip.show(d);
-                }).on('mouseout', function(d) {
-                    facilityToolTip.hide(d);
-                });
-        }
+        
 
 
         function drawBagEvent(bags, h) {
@@ -437,29 +394,7 @@
         }
 
 
-        function drawBagScopes(bag, h) {
-            svg.selectAll('.bag').data(bag).enter().append("rect")
-                .attr("x", function(d) {
-                    console.log(d);
-                    return timescale(d.start) - 5;
-                })
-                .attr("y", h)
-                .attr("width", function(d) {
-                    var x = timescale(d.end) - timescale(d.start) + 10;
-                    console.log(x);
-                    return x;
-                })
-                .attr("height", 100)
-                .attr('fill', function(d) {
-                    return color(d.bag);
-                })
-                .style('opacity', 0.4)
-                .on('mouseover', function(d) {
-                    bagToolTip.show(d);
-                }).on('mouseout', function(d) {
-                    bagToolTip.hide(d);
-                });
-        }
+        
 
 
         function drawConsignmentEvent(consignments, h) {
@@ -484,10 +419,10 @@
                     tooltip.hide(d);
                 });
         }
-
-
-        function drawConsignmentScopes(consignments, h) {
-            svg.selectAll('.consignment').data(consignments).enter().append("rect")
+        
+        function drawScopes(clazz, data,  h, boxheight) {
+            svg.selectAll('.'+clazz).data(data).enter().append("rect")
+                .classed(clazz, true)
                 .attr("x", function(d) {
                     console.log(d);
                     return timescale(d.start) - 5;
@@ -498,15 +433,15 @@
                     console.log(x);
                     return x;
                 })
-                .attr("height", 100)
+                .attr("height", boxheight)
                 .attr('fill', function(d) {
-                    return color(d.consignment);
+                    return color(d.id);
                 })
-                .style('opacity', 0.4)
+                .style('opacity', 0.8)
                 .on('mouseover', function(d) {
-                    consignmentToolTip.show(d);
+                    scopeTip.show(d);
                 }).on('mouseout', function(d) {
-                    consignmentToolTip.hide(d);
+                    scopeTip.hide(d);
                 });
         }
     </script>
