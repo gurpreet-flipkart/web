@@ -287,7 +287,7 @@
         });
 
         var timescale = d3.time.scale().domain(extent).range([0, 1200]);
-        drawEvents('shipment', data, false);
+        drawShipmentEvents('shipment', data);
         drawScopes('hub', perFacility, height - 50, 50);
 
         var byBag = d3.nest().key(function(d) {
@@ -329,10 +329,10 @@
 
 
         drawScopes('bag',bagScopes, 200, 100);
-        drawBagEvent(bags, 170);
+        drawScopeEvent('bagevent', bags, 185, 110);
 
         drawScopes('consignment', consignmentScopes, 50, 100);
-        drawConsignmentEvent(consignments, 0);
+        drawScopeEvent('consignmentevent', consignments, 30, 110);
 
 
 
@@ -340,7 +340,7 @@
         svg.call(scopeTip);
         console.log(bagScopes);
 
-        function drawEvents(clazz, events, striped) {
+        function drawShipmentEvents(clazz, events) {
 
             var selected = svg.selectAll('.' + clazz).data(events).enter().append("line").classed(clazz, true);
             selected.attr("x1", function(d) {
@@ -360,52 +360,16 @@
                 }).on('mouseout', function(d) {
                     tooltip.hide(d);
                 });
-            if (striped) {
-                selected.attr("stroke-dasharray", "10,10");
-            }
         }
 
-
-
-        
-
-
-        function drawBagEvent(bags, h) {
-            console.log(bags);
-            var selected = svg.selectAll('.bagevent').data(bags).enter();
-            selected.append("rect").classed('bagevent', true).attr("x", function(d) {
+        function drawScopeEvent(clazz, data, h, boxheight) {
+            var selected = svg.selectAll('.'+clazz).data(data).enter();
+            selected.append("rect").classed(clazz, true).attr("x", function(d) {
                     return timescale(timeFormat.parse(d.updatedAt)) - 2;
                 })
                 .attr("y", h)
                 .attr("width", 4)
-                .attr("height", 150)
-                .attr("stroke-width", 2)
-                .attr("stroke-dasharray", "10,10")
-                .attr("fill", function(d) {
-                    return color(d.status);
-                })
-                .attr("stroke", function(d) {
-                    return color(d.status);
-                }).on('mouseover', function(d) {
-                    tooltip.show(d);
-                }).on('mouseout', function(d) {
-                    tooltip.hide(d);
-                });
-        }
-
-
-        
-
-
-        function drawConsignmentEvent(consignments, h) {
-            console.log(bags);
-            var selected = svg.selectAll('.consignmentevent').data(consignments).enter();
-            selected.append("rect").classed('consignmentevent', true).attr("x", function(d) {
-                    return timescale(timeFormat.parse(d.updatedAt)) - 2;
-                })
-                .attr("y", h)
-                .attr("width", 4)
-                .attr("height", 150)
+                .attr("height", boxheight)
                 .attr("stroke-width", 2)
                 .attr("stroke-dasharray", "10,10")
                 .attr("fill", function(d) {
@@ -437,7 +401,7 @@
                 .attr('fill', function(d) {
                     return color(d.id);
                 })
-                .style('opacity', 0.8)
+                .style('opacity', 0.6)
                 .on('mouseover', function(d) {
                     scopeTip.show(d);
                 }).on('mouseout', function(d) {
