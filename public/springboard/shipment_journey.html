@@ -135,10 +135,6 @@
 
         svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + height + ")").call(xAxis);
 
-
-        drawShipmentEvents('shipment', data.shipments);
-        drawScopes('hub', perFacility, height - 50, 50);
-
         var byBag = d3.nest().key(function(d) {
             return d.bagid;
         }).entries(data.bags);
@@ -176,12 +172,15 @@
         });
 
 
-
+        drawBorders('bag', data.bags, 200, 100);
         drawScopes('bag', bagScopes, 200, 100);
         drawScopeEvent('bagevent', data.bags, 185, 110);
-
+        drawBorders('consignment', data.bags, 50, 100);
         drawScopes('consignment', consignmentScopes, 50, 100);
         drawScopeEvent('consignmentevent', data.consignments, 30, 110);
+
+        drawShipmentEvents('shipment', data.shipments);
+        drawScopes('hub', perFacility, height - 50, 50);
 
         mark('sfc_shipment', data.sfc.shipment, 8);
         mark('sfc_bag', data.sfc.bag, 170);
@@ -270,6 +269,34 @@
                 }).on('mouseout', function(d) {
                     scopeTip.hide(d);
                 });
+        }
+
+
+        function drawBorders(label, data, h, boxheight) {
+            var className = label + '_border';
+            var border = svg.append('g').classed(className, true)
+                .attr("transform", "translate(" + (timescale(timeFormat.parse(data[0].updatedAt)) - 20) + "," + (h - 10) + ")");
+            border.append("rect")
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width",
+                    timescale(timeFormat.parse(data[data.length - 1].updatedAt)) - timescale(timeFormat.parse(data[0].updatedAt)) + 40)
+                .attr("height", boxheight + 20)
+                .attr('fill', function(d) {
+                    return 'white';
+                })
+                .attr("stroke", 'grey')
+                .attr("stroke-width", 2)
+                .on('mouseover', function(d) {
+                    //scopeTip.show(d);
+                }).on('mouseout', function(d) {
+                    //scopeTip.hide(d);
+                });
+            border.append('text')
+                .attr("x", -10)
+                .attr("y", (boxheight/2))
+                .text(label)
+                .attr('transform', "rotate(90,-10,"+boxheight/2+")");
         }
     </script>
 </body>
