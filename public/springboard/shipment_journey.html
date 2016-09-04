@@ -21,7 +21,6 @@
             opacity: .9;
             font-size: 12px;
             padding: 10px;
-            width: 250px;
             line-height: 1;
             padding: 12px;
             background: rgba(0, 0, 0, 0.8);
@@ -78,8 +77,8 @@
             .attr('class', 'tooltip')
             .offset([-10, 0])
             .html(function(d) {
-                var content = "<span class=\"name\">Status   :</span><span class=\"stage\">" + d.status + "</span><br/>";
-                content += "<span class=\"name\">updated_at   :</span><span class=\"count\">" + d.updatedAt + "</span><br/>";
+                var content = "<span class=\"stage\">" + d.status + "</span><br/>";
+                content += "<span class=\"count\">" + d.updatedAt + "</span><br/>";
                 return content;
             });
 
@@ -183,9 +182,26 @@
 
         drawScopes('consignment', consignmentScopes, 50, 100);
         drawScopeEvent('consignmentevent', data.consignments, 30, 110);
-        
+
+        mark('sfc_shipment', data.sfc.shipment, 8);
+        mark('sfc_bag', data.sfc.bag, 170);
+        mark('sfc_consignment', data.sfc.consignment, 15);
         svg.call(tooltip);
         svg.call(scopeTip);
+
+        function mark(clazz, d, at) {
+            svg.selectAll('.' + clazz).data([d]).enter().append('circle').attr("cx", function(d) {
+                    return timescale(timeFormat.parse(d.updatedAt));
+                })
+                .attr("cy", at)
+                .attr("r", function(d) {
+                    return 8;
+                })
+                .style("stroke", function(d) {
+                    return color(d.status);
+                })
+                .style("fill", "white");
+        }
 
         function drawShipmentEvents(clazz, events) {
 

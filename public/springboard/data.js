@@ -164,5 +164,28 @@ var data = {
         'updatedAt': "2016-08-31 05:16:56",
         "hubid": 2270,
         'status': 'Received'
-    }]
+    }],
+    'sfc': {
+        'shipment': {
+            'id':'FMPC0149499495',
+            'status': 'Undelivered_Incomplete_Address',
+            'hubId': 2270,
+            "facility_type": "DELIVERY_HUB",
+            'updatedAt': '2016-09-03 11:10:13'
+        },
+        'bag': {
+            'id': 22087601,
+            "hubid": 2270,
+            "facility_type": "DELIVERY_HUB",
+            'updatedAt': "2016-08-31 05:22:03",
+            'status': 'RECEIVED'
+        },
+        'consignment': {
+            "id": 20177020,
+            'updatedAt': "2016-08-31 05:16:56",
+            "hubid": 2270,
+            'status': 'Received'
+        }
+    },
+
 };
