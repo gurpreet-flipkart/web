@@ -13,6 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
     <script src="d3.array.0.7.min.js"></script>
     <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+    <script src="data.js"></script>
 
     <style>
         .tooltip {
@@ -70,7 +71,6 @@
     <div id='journey'>
     </div>
     <script>
-        //TODO add an axis of time for days.
         //status should lie veritically along lines.
         //shipment based consignments not covered yet.
 
@@ -91,178 +91,11 @@
                 return content;
             });
 
-
-        var data = [{
-            'status': 'Expected',
-            'hubId': 278,
-            "facility_type": "motherhub",
-            'updatedAt': "2016-08-29 20:24:20"
-        }, {
-            'status': 'InScan_Success',
-            'hubId': 278,
-            "facility_type": "motherhub",
-            'updatedAt': '2016-08-29 20:24:20'
-        }, {
-            'status': 'Received',
-            'hubId': 278,
-            "facility_type": "motherhub",
-            'updatedAt': '2016-08-29 20:27:56'
-        }, {
-            'status': 'Undelivered_Not_Attended',
-            'hubId': 278,
-            "facility_type": "motherhub",
-            'updatedAt': '2016-08-29 22:27:56'
-        }, {
-            'status': 'Expected',
-            'hubId': 119,
-            "facility_type": "motherhub",
-            'updatedAt': '2016-08-30 04:00:41'
-        }, {
-            'status': 'Expected',
-            'hubId': 119,
-            "facility_type": "motherhub",
-            'updatedAt': '2016-08-30 04:00:41'
-        }, {
-            'status': 'Recieved',
-            'hubId': 119,
-            "facility_type": "motherhub",
-            'updatedAt': '2016-08-30 18:52:54'
-        }, {
-            'status': 'Undelivered_Not_Attended',
-            'hubId': 119,
-            "facility_type": "motherhub",
-            'updatedAt': '2016-08-30 18:52:54'
-        }, {
-            'status': 'Expected',
-            'hubId': 2270,
-            "facility_type": "motherhub",
-            'updatedAt': '2016-08-31 01:41:04'
-        }, {
-            'status': 'Received',
-            'hubId': 2270,
-            "facility_type": "DELIVERY_HUB",
-            'updatedAt': '2016-08-31 05:23:24'
-        }, {
-            'status': 'Undelivered_Incomplete_Address',
-            'hubId': 2270,
-            "facility_type": "DELIVERY_HUB",
-            'updatedAt': '2016-08-31 10:47:15'
-        }, {
-            'status': 'Undelivered_Incomplete_Address',
-            'hubId': 2270,
-            "facility_type": "DELIVERY_HUB",
-            'updatedAt': '2016-09-01 16:29:27'
-        }, {
-            'status': 'Undelivered_Incomplete_Address',
-            'hubId': 2270,
-            "facility_type": "DELIVERY_HUB",
-            'updatedAt': '2016-09-01 16:29:41'
-        }, {
-            'status': 'Undelivered_Incomplete_Address',
-            'hubId': 2270,
-            "facility_type": "DELIVERY_HUB",
-            'updatedAt': '2016-09-03 11:10:13'
-        }];
-
-        var bags = [{
-            'bagid': "22046017",
-            "hubid": 278,
-            "facility_type": "motherhub",
-            'updatedAt': "2016-08-29 20:46:37",
-            'status': 'OPEN'
-        }, {
-            'bagid': 22046017,
-            "hubid": 278,
-            "facility_type": "motherhub",
-            'updatedAt': "2016-08-29 20:46:40",
-            'status': 'CLOSED'
-        }, {
-            'bagid': 22046017,
-            "hubid": 278,
-            "facility_type": "motherhub",
-            'updatedAt': "2016-08-30 04:00:01",
-            'status': 'INTRANSIT'
-        }, {
-            'bagid': 22046017,
-            "hubid": 278,
-            "facility_type": "motherhub",
-            'updatedAt': "2016-08-30 13:30:02",
-            'status': 'REACHED'
-        }, {
-            'bagid': 22046017,
-            "hubid": 278,
-            "facility_type": "motherhub",
-            'updatedAt': "2016-08-30 18:52:37",
-            'status': 'RECEIVED'
-        }, {
-            'bagid': 22087601,
-            "hubid": 119,
-            'updatedAt': "2016-08-31 00:17:30",
-            'status': 'OPEN'
-        }, {
-            'bagid': 22087601,
-            "hubid": 119,
-            "facility_type": "motherhub",
-            'updatedAt': "2016-08-31 00:17:33",
-            'status': 'CLOSED'
-        }, {
-            'bagid': 22087601,
-            "hubid": 119,
-            "facility_type": "motherhub",
-            'updatedAt': "2016-08-31 01:41:00",
-
-            'status': 'INTRANSIT'
-        }, {
-            'bagid': 22087601,
-            "hubid": 2270,
-            "facility_type": "DELIVERY_HUB",
-            'updatedAt': "2016-08-31 05:18:38",
-            'status': 'REACHED'
-        }, {
-            'bagid': 22087601,
-            "hubid": 2270,
-            "facility_type": "DELIVERY_HUB",
-            'updatedAt': "2016-08-31 05:22:03",
-            'status': 'RECEIVED'
-        }];
-
-
-        var consignments = [{
-            "consignmentid": 20173310,
-            'updatedAt': "2016-08-30 03:59:39",
-            "hubid": 278,
-            'status': 'Created'
-        }, {
-            "consignmentid": 20173310,
-            'updatedAt': "2016-08-30 03:59:58",
-            "hubid": 119,
-            'status': 'Expected'
-        }, {
-            "consignmentid": 20173310,
-            'updatedAt': "2016-08-30 13:12:16",
-            "hubid": 119,
-            'status': 'Received'
-        }, {
-            "consignmentid": 20177020,
-            'updatedAt': "2016-08-31 01:40:54",
-            "hubid": 119,
-            'status': 'Created'
-        }, {
-            "consignmentid": 20177020,
-            'updatedAt': "2016-08-31 01:40:57",
-            "hubid": 2270,
-            'status': 'Expected'
-        }, {
-            "consignmentid": 20177020,
-            'updatedAt': "2016-08-31 05:16:56",
-            "hubid": 2270,
-            'status': 'Received'
-        }]
         var timeFormat = d3.time.format('%Y-%m-%d %H:%M:%S');
         var perFacility = d3.nest().key(function(d) {
             console.log(d.hubId);
             return d.hubId;
-        }).entries(data).filter(function(d) {
+        }).entries(data.shipments).filter(function(d) {
             return d.values.length >= 2;
         }).map(function(d) {
             console.log(d);
@@ -293,7 +126,7 @@
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-        var extent = d3.extent(data, function(d) {
+        var extent = d3.extent(data.shipments, function(d) {
             return timeFormat.parse(d.updatedAt);
         });
 
@@ -304,12 +137,12 @@
         svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + height + ")").call(xAxis);
 
 
-        drawShipmentEvents('shipment', data);
+        drawShipmentEvents('shipment', data.shipments);
         drawScopes('hub', perFacility, height - 50, 50);
 
         var byBag = d3.nest().key(function(d) {
             return d.bagid;
-        }).entries(bags);
+        }).entries(data.bags);
 
 
         var bagScopes = byBag.filter(function(d) {
@@ -329,7 +162,7 @@
 
         var consignmentScopes = d3.nest().key(function(d) {
             return d.consignmentid;
-        }).entries(consignments).filter(function(d) {
+        }).entries(data.consignments).filter(function(d) {
             return d.values.length >= 2;
         }).map(function(d) {
             return {
@@ -346,16 +179,13 @@
 
 
         drawScopes('bag', bagScopes, 200, 100);
-        drawScopeEvent('bagevent', bags, 185, 110);
+        drawScopeEvent('bagevent', data.bags, 185, 110);
 
         drawScopes('consignment', consignmentScopes, 50, 100);
-        drawScopeEvent('consignmentevent', consignments, 30, 110);
-
-
-
+        drawScopeEvent('consignmentevent', data.consignments, 30, 110);
+        
         svg.call(tooltip);
         svg.call(scopeTip);
-        console.log(bagScopes);
 
         function drawShipmentEvents(clazz, events) {
 
