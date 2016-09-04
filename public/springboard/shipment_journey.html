@@ -55,6 +55,13 @@
             font-size: 10px;
             font-family: "Comic Sans MS", "Comic Sans", cursive;
         }
+        
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: black;
+            shape-rendering: crispEdges;
+        }
     </style>
 
 </head>
@@ -63,6 +70,10 @@
     <div id='journey'>
     </div>
     <script>
+        //TODO add an axis of time for days.
+        //status should lie veritically along lines.
+        //shipment based consignments not covered yet.
+
         var tooltip = d3.tip()
             .attr('class', 'tooltip')
             .offset([-10, 0])
@@ -287,6 +298,12 @@
         });
 
         var timescale = d3.time.scale().domain(extent).range([0, 1200]);
+
+        var xAxis = d3.svg.axis().scale(timescale).orient("bottom").ticks(20);
+
+        svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + height + ")").call(xAxis);
+
+
         drawShipmentEvents('shipment', data);
         drawScopes('hub', perFacility, height - 50, 50);
 
@@ -328,7 +345,7 @@
 
 
 
-        drawScopes('bag',bagScopes, 200, 100);
+        drawScopes('bag', bagScopes, 200, 100);
         drawScopeEvent('bagevent', bags, 185, 110);
 
         drawScopes('consignment', consignmentScopes, 50, 100);
@@ -363,7 +380,7 @@
         }
 
         function drawScopeEvent(clazz, data, h, boxheight) {
-            var selected = svg.selectAll('.'+clazz).data(data).enter();
+            var selected = svg.selectAll('.' + clazz).data(data).enter();
             selected.append("rect").classed(clazz, true).attr("x", function(d) {
                     return timescale(timeFormat.parse(d.updatedAt)) - 2;
                 })
@@ -383,9 +400,9 @@
                     tooltip.hide(d);
                 });
         }
-        
-        function drawScopes(clazz, data,  h, boxheight) {
-            svg.selectAll('.'+clazz).data(data).enter().append("rect")
+
+        function drawScopes(clazz, data, h, boxheight) {
+            svg.selectAll('.' + clazz).data(data).enter().append("rect")
                 .classed(clazz, true)
                 .attr("x", function(d) {
                     console.log(d);
