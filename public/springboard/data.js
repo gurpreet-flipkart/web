@@ -21,12 +21,12 @@ var data = {
         'updatedAt': '2016-08-29 22:27:56'
     }, {
         'status': 'Expected',
-        'hubId': 119,
+        'hubId': 278,
         "facility_type": "motherhub",
         'updatedAt': '2016-08-30 04:00:41'
     }, {
         'status': 'Expected',
-        'hubId': 119,
+        'hubId': 278,
         "facility_type": "motherhub",
         'updatedAt': '2016-08-30 04:00:41'
     }, {
@@ -41,7 +41,7 @@ var data = {
         'updatedAt': '2016-08-30 18:52:54'
     }, {
         'status': 'Expected',
-        'hubId': 2270,
+        'hubId': 119,
         "facility_type": "motherhub",
         'updatedAt': '2016-08-31 01:41:04'
     }, {
@@ -91,13 +91,13 @@ var data = {
         'status': 'INTRANSIT'
     }, {
         'bagid': 22046017,
-        "hubid": 278,
+        "hubid": 119,
         "facility_type": "motherhub",
         'updatedAt': "2016-08-30 13:30:02",
         'status': 'REACHED'
     }, {
         'bagid': 22046017,
-        "hubid": 278,
+        "hubid": 119,
         "facility_type": "motherhub",
         'updatedAt': "2016-08-30 18:52:37",
         'status': 'RECEIVED'

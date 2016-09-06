@@ -72,7 +72,8 @@
     <script>
         //status should lie veritically along lines.
         //shipment based consignments not covered yet.
-
+        //cases like in-transit and expected must be taken care of.
+        //the hub attributed to them must be source and not destination.
         var tooltip = d3.tip()
             .attr('class', 'tooltip')
             .offset([-10, 0])
@@ -89,7 +90,7 @@
                 var content = "<span class=\"name\">scope   :</span><span class=\"stage\">" + d.id + "</span><br/>";
                 return content;
             });
-
+        
         var timeFormat = d3.time.format('%Y-%m-%d %H:%M:%S');
         var perFacility = d3.nest().key(function(d) {
             console.log(d.hubId);
@@ -117,7 +118,7 @@
                 bottom: 30,
                 left: 80
             },
-            width = 2000 - margin.left - margin.right,
+            width = 1300 - margin.left - margin.right,
             height = 500 - margin.top - margin.bottom;
         var color = d3.scale.category10();
         var svg = d3.select("body").append("svg")
@@ -129,7 +130,7 @@
             return timeFormat.parse(d.updatedAt);
         });
 
-        var timescale = d3.time.scale().domain(extent).range([0, 1200]);
+        var timescale = d3.time.scale().domain(extent).range([0, width]);
 
         var xAxis = d3.svg.axis().scale(timescale).orient("bottom").ticks(20);
 
@@ -285,8 +286,9 @@
                 .attr('fill', function(d) {
                     return 'white';
                 })
-                .attr("stroke", 'grey')
+                .attr("stroke", 'lightgrey')
                 .attr("stroke-width", 2)
+                //.style('opacity', 0.6)
                 .on('mouseover', function(d) {
                     //scopeTip.show(d);
                 }).on('mouseout', function(d) {
@@ -294,9 +296,10 @@
                 });
             border.append('text')
                 .attr("x", -10)
-                .attr("y", (boxheight/2))
-                .text(label)
-                .attr('transform', "rotate(90,-10,"+boxheight/2+")");
+                .style("text-anchor", "middle")
+                .attr("y", (boxheight / 2))
+                .text(label + 's')
+                .attr('transform', "rotate(90,-10," + boxheight / 2 + ")");
         }
     </script>
 </body>
